@@ -1,4 +1,4 @@
-name: Build APK from WebView
+name: Build APK
 
 on:
   workflow_dispatch:
@@ -15,29 +15,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # Чистим всё перед сборкой
-      - name: Clean previous build
-        run: |
-          rm -rf app
-          rm -rf .gradle
-
-      - name: Download WebView template
-        run: |
-          git clone https://github.com/SheikhAmin/Android-WebView-App-Template.git app
-          cd app
-          rm -rf .git
-          sed -i 's/Example App/Telegram Clone/g' app/src/main/res/values/strings.xml
-          sed -i 's/example.com/web.telegram.org/g' app/app/src/main/java/com/example/webview/MainActivity.java
-
       - name: Build APK
         run: |
-          cd app
           chmod +x gradlew
-          ./gradlew clean
           ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Telegram-Clone
-          path: app/app/build/outputs/apk/debug/app-debug.apk
+          name: MyApp
+          path: app/build/outputs/apk/debug/*.apk
