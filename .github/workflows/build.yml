@@ -1,7 +1,7 @@
 name: Build APK from WebView
 
 on:
-  workflow_dispatch:  # Запуск кнопкой
+  workflow_dispatch:
 
 jobs:
   build:
@@ -9,14 +9,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. Устанавливаем Java
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # 2. Скачиваем готовый шаблон WebView приложения
+      # Чистим всё перед сборкой
+      - name: Clean previous build
+        run: |
+          rm -rf app
+          rm -rf .gradle
+
       - name: Download WebView template
         run: |
           git clone https://github.com/SheikhAmin/Android-WebView-App-Template.git app
@@ -25,14 +29,13 @@ jobs:
           sed -i 's/Example App/Telegram Clone/g' app/src/main/res/values/strings.xml
           sed -i 's/example.com/web.telegram.org/g' app/app/src/main/java/com/example/webview/MainActivity.java
 
-      # 3. Собираем APK
       - name: Build APK
         run: |
           cd app
           chmod +x gradlew
+          ./gradlew clean
           ./gradlew assembleDebug
 
-      # 4. Загружаем результат
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
